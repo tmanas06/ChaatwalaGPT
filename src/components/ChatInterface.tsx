@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, KeyboardEvent, FormEvent } from 'react';
+import { usePrivy } from '@privy-io/react-auth';
 import { Message } from '@/lib/types';
 import { renderMarkdown } from '@/lib/markdown';
 import { SUGGESTIONS_TRANSLATIONS } from '@/lib/translations';
@@ -89,31 +90,77 @@ declare global {
   }
 }
 
+interface ChatSession {
+  id: string;
+  title: string;
+  messages: Message[];
+}
+
+const generateId = () => Math.random().toString(36).substring(2, 15);
+
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { login, logout, authenticated, user } = usePrivy();
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+
+  const activeSession = sessions.find((s) => s.id === activeSessionId);
+  const messages = activeSession?.messages || [];
+
+  const updateActiveMessages = useCallback((updater: (prev: Message[]) => Message[]) => {
+    setSessions((prev) =>
+      prev.map((s) => {
+        if (s.id === activeSessionId) {
+          const newMsgs = updater(s.messages);
+          let title = s.title;
+          if ((title === 'New Order' || title === 'Guest Chat') && newMsgs.length > 0) {
+            const firstUser = newMsgs.find(m => m.role === 'user');
+            if (firstUser) {
+              title = firstUser.content.slice(0, 20) + (firstUser.content.length > 20 ? '...' : '');
+            }
+          }
+          return { ...s, messages: newMsgs, title };
+        }
+        return s;
+      })
+    );
+  }, [activeSessionId]);
+
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Phase 5: Local Storage Memory
+  // Phase 5: Local Storage Memory (now authenticated)
   useEffect(() => {
-    const saved = localStorage.getItem('chaatwala_messages');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.length > 0) {
-          setMessages(parsed);
+    if (authenticated && user?.id) {
+      const saved = localStorage.getItem(`chaatwala_sessions_${user.id}`);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.length > 0) {
+            setSessions(parsed);
+            setActiveSessionId(parsed[0].id);
+            return;
+          }
+        } catch (e) {
+          console.error('Failed to load chat history:', e);
         }
-      } catch (e) {
-        console.error('Failed to load chat history:', e);
       }
+      const initialId = generateId();
+      setSessions([{ id: initialId, title: 'New Order', messages: [] }]);
+      setActiveSessionId(initialId);
+    } else {
+      const tempId = 'temp-session';
+      setSessions([{ id: tempId, title: 'Guest Chat', messages: [] }]);
+      setActiveSessionId(tempId);
     }
-  }, []);
+  }, [authenticated, user?.id]);
 
   useEffect(() => {
-    localStorage.setItem('chaatwala_messages', JSON.stringify(messages));
-  }, [messages]);
+    if (authenticated && user?.id && sessions.length > 0) {
+      localStorage.setItem(`chaatwala_sessions_${user.id}`, JSON.stringify(sessions));
+    }
+  }, [sessions, authenticated, user?.id]);
   const [factIndex, setFactIndex] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageOption>(LANGUAGES[0]);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
@@ -165,8 +212,6 @@ export default function ChatInterface() {
       textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
     }
   }, []);
-
-  const generateId = () => Math.random().toString(36).substring(2, 15);
 
   // Voice-to-text
   const startListening = useCallback(() => {
@@ -240,6 +285,7 @@ export default function ChatInterface() {
 
     setError(null);
 
+    // Add user message
     const userMessage: Message = {
       id: generateId(),
       role: 'user',
@@ -247,7 +293,7 @@ export default function ChatInterface() {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    updateActiveMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
     setIsStreaming(false);
@@ -289,15 +335,11 @@ export default function ChatInterface() {
       const decoder = new TextDecoder();
       let accumulatedContent = '';
 
-      // Create assistant message placeholder
-      const assistantMessage: Message = {
-        id: assistantId,
-        role: 'assistant',
-        content: '',
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
+      // Add empty assistant message placeholder
+      updateActiveMessages((prev) => [
+        ...prev,
+        { id: assistantId, role: 'assistant', content: '', timestamp: new Date() },
+      ]);
       setIsStreaming(true);
       setIsLoading(false);
 
@@ -331,7 +373,7 @@ export default function ChatInterface() {
               if (!rafPending) {
                 rafPending = true;
                 requestAnimationFrame(() => {
-                  setMessages((prev) =>
+                  updateActiveMessages((prev) =>
                     prev.map((m) =>
                       m.id === assistantId
                         ? { ...m, content: accumulatedContent }
@@ -367,7 +409,7 @@ export default function ChatInterface() {
       );
 
       // Remove empty assistant message if error happened before any content
-      setMessages((prev) => prev.filter((m) => m.id !== assistantId || m.content.length > 0));
+      updateActiveMessages((prev) => prev.filter((m) => m.id !== assistantId || m.content.length > 0));
     } finally {
       setIsLoading(false);
       setIsStreaming(false);
@@ -413,6 +455,18 @@ export default function ChatInterface() {
             </div>
           </div>
           <div className={styles.headerRight}>
+            <div className={styles.authWrapper}>
+              {authenticated ? (
+                <button className={styles.langBtn} onClick={logout}>
+                  Sign Out
+                </button>
+              ) : (
+                <button className={styles.langBtn} onClick={login} style={{ background: 'var(--saffron)', color: 'white', borderColor: 'var(--saffron)' }}>
+                  Sign In to Save Chats
+                </button>
+              )}
+            </div>
+            
             {/* Language Selector */}
             <div className={styles.langSelector} ref={langDropdownRef}>
               <button
@@ -469,6 +523,50 @@ export default function ChatInterface() {
           </div>
         </div>
       </header>
+
+      {/* TABS BAR */}
+      {authenticated && sessions.length > 0 && (
+        <div className={styles.tabBar}>
+          <button 
+            className={styles.newTabBtn}
+            onClick={() => {
+              const id = generateId();
+              setSessions(prev => [{ id, title: 'New Order', messages: [] }, ...prev]);
+              setActiveSessionId(id);
+            }}
+            title="Start new chat"
+          >
+            +
+          </button>
+          <div className={styles.tabsScroll}>
+            {sessions.map(s => (
+              <div 
+                key={s.id} 
+                className={`${styles.tab} ${s.id === activeSessionId ? styles.tabActive : ''}`}
+                onClick={() => setActiveSessionId(s.id)}
+              >
+                <span className={styles.tabTitle}>{s.title}</span>
+                {sessions.length > 1 && (
+                  <button 
+                    className={styles.tabClose}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const newSessions = sessions.filter(x => x.id !== s.id);
+                      setSessions(newSessions);
+                      if (activeSessionId === s.id) {
+                        setActiveSessionId(newSessions[0].id);
+                      }
+                    }}
+                    title="Close chat"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* CHAT AREA */}
       <main className={styles.chatArea}>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import PrivyProviderWrapper from '@/components/PrivyProviderWrapper';
 
 export const metadata: Metadata = {
   title: 'ChaatwalaGPT — Indian Street Food Guide',
@@ -23,7 +24,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <PrivyProviderWrapper>
+          {children}
+        </PrivyProviderWrapper>
+      </body>
     </html>
   );
 }
