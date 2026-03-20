@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback, KeyboardEvent, FormEvent } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo, KeyboardEvent, FormEvent } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import { Message } from '@/lib/types';
 import { renderMarkdown } from '@/lib/markdown';
-import { SUGGESTIONS_TRANSLATIONS } from '@/lib/translations';
 import styles from './ChatInterface.module.css';
 
 const FOOD_FACTS = [
@@ -104,7 +103,7 @@ export default function ChatInterface() {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
   const activeSession = sessions.find((s) => s.id === activeSessionId);
-  const messages = activeSession?.messages || [];
+  const messages = useMemo(() => activeSession?.messages || [], [activeSession?.messages]);
 
   const updateActiveMessages = useCallback((updater: (prev: Message[]) => Message[]) => {
     setSessions((prev) =>
