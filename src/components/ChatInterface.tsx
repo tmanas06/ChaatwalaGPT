@@ -14,7 +14,19 @@ const FOOD_FACTS = [
   '🍋 Amchur = dried mango powder',
 ];
 
+const CRAVING_CHIPS = [
+  { icon: '🧆', label: 'Pani Puri' },
+  { icon: '🥘', label: 'Bhel Puri' },
+  { icon: '🍛', label: 'Dahi Papdi' },
+  { icon: '✨', label: 'Surprise Me!' }
+];
 
+const QUICK_ACTIONS = [
+  { icon: '🔥', label: 'Make it spicy', prompt: 'Give me a spicier version of that!' },
+  { icon: '🧂', label: 'Less masala', prompt: 'Can you make it with less masala/spice?' },
+  { icon: '🥗', label: 'Healthy version', prompt: 'How can I make a healthier version of this?' },
+  { icon: '💸', label: 'Under ₹50', prompt: 'What are the best street foods under 50 rupees?' },
+];
 
 interface LanguageOption {
   code: string;
@@ -83,6 +95,25 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Phase 5: Local Storage Memory
+  useEffect(() => {
+    const saved = localStorage.getItem('chaatwala_messages');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.length > 0) {
+          setMessages(parsed);
+        }
+      } catch (e) {
+        console.error('Failed to load chat history:', e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('chaatwala_messages', JSON.stringify(messages));
+  }, [messages]);
   const [factIndex, setFactIndex] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageOption>(LANGUAGES[0]);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
@@ -330,7 +361,9 @@ export default function ChatInterface() {
 
       console.error('Chat error:', err);
       setError(
-        err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+        err instanceof Error && err.message !== 'Failed to fetch' 
+          ? err.message 
+          : 'Arre bhaiya, system garam ho gaya 😅 try again'
       );
 
       // Remove empty assistant message if error happened before any content
@@ -443,12 +476,9 @@ export default function ChatInterface() {
           {isEmpty ? (
             <div className={styles.emptyState}>
               <div className={styles.emptyEmoji}>🍢</div>
-              <h2 className={styles.emptyTitle}>ChaatwalaGPT</h2>
-              <p className={styles.emptyTagline}>
-                Aao, khao, seekho! — Come, eat, learn!
-              </p>
+              <h2 className={styles.emptyTitle}>What are you craving today?</h2>
               <p className={styles.emptySubtitle}>
-                Ask Chaatwaala anything about Indian street food — recipes,
+                Ask Chaatwala anything about Indian street food — recipes,
                 regions, history, or where to eat.
               </p>
 
@@ -461,13 +491,14 @@ export default function ChatInterface() {
               </div>
 
               <div className={styles.suggestionsGrid}>
-                {(SUGGESTIONS_TRANSLATIONS[selectedLanguage.code] || SUGGESTIONS_TRANSLATIONS['en']).map((suggestion, i) => (
+                {CRAVING_CHIPS.map((chip, i) => (
                   <button
                     key={i}
                     className={styles.suggestionChip}
-                    onClick={() => sendMessage(suggestion)}
+                    onClick={() => sendMessage(`I am craving ${chip.label}. Tell me more!`)}
                   >
-                    {suggestion}
+                    <span className={styles.chipIcon}>{chip.icon}</span>
+                    <span>{chip.label}</span>
                   </button>
                 ))}
               </div>
@@ -499,6 +530,13 @@ export default function ChatInterface() {
                     {message.role === 'assistant' ? (
                       <div
                         className="markdown-content"
+                        onClick={(e) => {
+                          const target = e.target as HTMLElement;
+                          if (target.matches('.markdown-action-btn')) {
+                            const prompt = target.getAttribute('data-prompt');
+                            if (prompt) sendMessage(prompt);
+                          }
+                        }}
                         dangerouslySetInnerHTML={{
                           __html: renderMarkdown(message.content),
                         }}
@@ -528,7 +566,7 @@ export default function ChatInterface() {
                       <span className={styles.dot} />
                     </div>
                     <span className={styles.thinkingText}>
-                      Chaatwaala is thinking...
+                      Chaatwala is preparing your order… 🧑‍🍳
                     </span>
                   </div>
                 </div>
@@ -555,6 +593,23 @@ export default function ChatInterface() {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <form className={styles.inputForm} onSubmit={handleSubmit}>
+            
+            {/* Quick Actions */}
+            <div className={styles.quickActions}>
+              {QUICK_ACTIONS.map((action, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={styles.quickActionBtn}
+                  onClick={() => sendMessage(action.prompt)}
+                  disabled={isLoading || isStreaming}
+                >
+                  <span>{action.icon}</span>
+                  <span>{action.label}</span>
+                </button>
+              ))}
+            </div>
+
             <div className={styles.inputWrapper}>
               {/* Voice-to-text button */}
               {speechSupported && (

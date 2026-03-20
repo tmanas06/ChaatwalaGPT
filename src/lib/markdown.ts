@@ -11,6 +11,13 @@ export function renderMarkdown(text: string): string {
 
   let html = escapeHtml(sanitized);
 
+  // Custom Structured UI from AI Chaatwala
+  html = html
+    .replace(/-\s+\[INGREDIENT\]\s+(.+)/g, '<span class="ingredient-tag">🥗 $1</span>')
+    .replace(/\[BTN:\s*(.+?)\]/g, '<button class="markdown-action-btn" data-prompt="$1">$1</button>')
+    .replace(/###\s*RECIPE([\s\S]*?)(?=###|$)/g, '<div class="recipe-card"><div class="recipe-header">🧑‍🍳 Chaatwala\'s Recipe</div><div class="recipe-body">$1</div></div>')
+    .replace(/###\s*COMBO([\s\S]*?)(?=###|$)/g, '<div class="combo-card"><div class="combo-header">🍽️ Suggested Combo</div><div class="combo-body">$1</div></div>');
+
   // Bold and italic replacements
   html = html
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
