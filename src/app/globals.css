@@ -1,22 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&family=Kalam:wght@300;400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&family=Kalam:wght@300;400;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
 :root {
+  /* Core Spice Palette */
   --saffron: #FF6B00;
-  --deep-red: #C0392B;
-  --turmeric: #F4A623;
+  --deep-red: #D32F2F;
+  --turmeric: #F4A261;
+  --warm-brown: #4A2C0A;
+  
+  /* Neutrals */
   --cream: #FFF8EF;
   --dark-ink: #1A0F00;
-  --warm-brown: #4A2C0A;
-  --mint-chutney: #2D7A4F;
-  --pale-cream: #FFF3E0;
-
+  
+  /* UI Colors */
+  --success: #2E7D32;
+  --error: #C62828;
+  
+  /* Typography */
   --font-playfair: 'Playfair Display', Georgia, serif;
   --font-kalam: 'Kalam', cursive;
   --font-dm: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-
-  --shadow-sm: 0 1px 3px rgba(26, 15, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(26, 15, 0, 0.1);
-  --shadow-lg: 0 8px 24px rgba(26, 15, 0, 0.12);
+  
+  /* Effects */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
 }
 
 *,
@@ -28,8 +34,11 @@
 }
 
 html, body {
-  height: 100%;
+  /* Ensure the body exactly fits the viewport to prevent unwanted scrolling */
+  height: 100vh;
+  height: 100dvh; /* For mobile browsers with dynamic toolbars */
   overflow: hidden;
+  width: 100vw;
 }
 
 body {
@@ -41,7 +50,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar styles */
+/* Custom Scrollbar for inner elements */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -51,124 +60,105 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(244, 166, 35, 0.3);
+  background: rgba(255, 107, 0, 0.2);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(244, 166, 35, 0.5);
+  background: rgba(255, 107, 0, 0.4);
 }
 
-/* Markdown content styles */
-.markdown-content h2 {
+/* Base Markdown Styles (Applied inside the ChatBubble) */
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3 {
   font-family: var(--font-playfair);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--warm-brown);
-  margin: 1rem 0 0.5rem;
+  color: var(--saffron);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
 }
 
 .markdown-content h3 {
-  font-family: var(--font-playfair);
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--warm-brown);
-  margin: 0.8rem 0 0.4rem;
-}
-
-.markdown-content h4 {
-  font-family: var(--font-dm);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--warm-brown);
-  margin: 0.6rem 0 0.3rem;
+  font-size: 1.15rem;
+  font-weight: 700;
 }
 
 .markdown-content p {
-  margin: 0.4rem 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .markdown-content strong {
-  color: var(--warm-brown);
-  font-weight: 600;
+  color: var(--deep-red);
+  font-weight: 700;
 }
 
 .markdown-content em {
-  color: var(--saffron);
   font-style: italic;
+  color: var(--warm-brown);
 }
 
-.markdown-content ul {
-  padding-left: 1.2rem;
-  margin: 0.4rem 0;
+.markdown-content ul, 
+.markdown-content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .markdown-content li {
-  margin: 0.2rem 0;
-  line-height: 1.5;
+  margin-bottom: 0.3rem;
 }
 
 .markdown-content code {
-  background: rgba(244, 166, 35, 0.12);
-  padding: 0.15rem 0.4rem;
+  background: rgba(255, 107, 0, 0.1);
+  padding: 0.15rem 0.3rem;
   border-radius: 4px;
-  font-size: 0.88rem;
+  font-size: 0.9em;
   font-family: 'Fira Code', monospace;
-  color: var(--warm-brown);
+  color: var(--dark-ink);
 }
 
 .markdown-content pre {
   background: var(--dark-ink);
   color: var(--cream);
-  padding: 0.8rem 1rem;
+  padding: 1rem;
   border-radius: 8px;
   overflow-x: auto;
-  margin: 0.5rem 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
   font-size: 0.85rem;
 }
 
 .markdown-content pre code {
   background: none;
-  padding: 0;
   color: inherit;
+  padding: 0;
 }
 
-/* Animations */
+/* Shared Utility Animations */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes messageIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+  50% { transform: translateY(-10px); }
 }
 
 @keyframes sway {
-  0%, 100% { transform: rotate(-8deg); }
-  50% { transform: rotate(8deg); }
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
 }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.1); }
+  50% { opacity: 0.7; transform: scale(1.1); box-shadow: 0 0 8px rgba(46, 204, 113, 0.4); }
 }
 
 @keyframes blink {
@@ -178,7 +168,7 @@ body {
 
 @keyframes bounce {
   0%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-6px); }
+  40% { transform: translateY(-5px); }
 }
 
 @keyframes shake {
@@ -188,13 +178,8 @@ body {
 }
 
 @keyframes ticker {
-  0% { opacity: 0; transform: translateY(8px); }
+  0% { opacity: 0; transform: translateY(10px); }
   10% { opacity: 1; transform: translateY(0); }
   90% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-8px); }
-}
-
-@keyframes dotGrid {
-  0% { background-position: 0 0; }
-  100% { background-position: 20px 20px; }
+  100% { opacity: 0; transform: translateY(-10px); }
 }
