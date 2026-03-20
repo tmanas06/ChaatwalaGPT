@@ -632,7 +632,7 @@ export default function ChatInterface() {
                     className={styles.recentButton}
                     onClick={() => sendMessage(localStorage.getItem(`chaatwala_last_order_${user?.id}`) || '')}
                   >
-                    Repeat: "{localStorage.getItem(`chaatwala_last_order_${user?.id}`)}"
+                    Repeat: &quot;{localStorage.getItem(`chaatwala_last_order_${user?.id}`)}&quot;
                   </button>
                 </div>
               )}
