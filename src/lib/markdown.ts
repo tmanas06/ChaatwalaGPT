@@ -5,7 +5,7 @@
 
 export function renderMarkdown(text: string): string {
   // 1. Sanitize raw HTML from LLM to prevent XSS (if any <script> tags leak)
-  let sanitized = text
+  const sanitized = text
     .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
     .replace(/<[^>]+>/g, '');
 
