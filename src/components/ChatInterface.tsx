@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback, KeyboardEvent, FormEvent } from 'react';
 import { Message } from '@/lib/types';
 import { renderMarkdown } from '@/lib/markdown';
+import { SUGGESTIONS_TRANSLATIONS } from '@/lib/translations';
 import styles from './ChatInterface.module.css';
 
 const FOOD_FACTS = [
@@ -13,14 +14,7 @@ const FOOD_FACTS = [
   '🍋 Amchur = dried mango powder',
 ];
 
-const SUGGESTIONS = [
-  'What makes Mumbai\'s pani puri different from Kolkata\'s phuchka?',
-  'How do I make authentic tamarind chutney?',
-  'Best street food spots in Delhi\'s Chandni Chowk?',
-  'Tell me about the history of vada pav',
-  'What street foods are vegan-friendly?',
-  'Explain chaat masala and what it tastes like',
-];
+
 
 interface LanguageOption {
   code: string;
@@ -37,16 +31,16 @@ const LANGUAGES: LanguageOption[] = [
   { code: 'bn', label: 'Bengali', nativeLabel: 'বাংলা', speechCode: 'bn-IN' },
   { code: 'mr', label: 'Marathi', nativeLabel: 'मराठी', speechCode: 'mr-IN' },
   { code: 'gu', label: 'Gujarati', nativeLabel: 'ગુજરાતી', speechCode: 'gu-IN' },
-  { code: 'kn', label: 'Kannada', nativeLabel: 'ಕನ್ನಡ', speechCode: 'kn-IN' },
-  { code: 'ml', label: 'Malayalam', nativeLabel: 'മലയാളം', speechCode: 'ml-IN' },
-  { code: 'pa', label: 'Punjabi', nativeLabel: 'ਪੰਜਾਬੀ', speechCode: 'pa-IN' },
+  // { code: 'kn', label: 'Kannada', nativeLabel: 'ಕನ್ನಡ', speechCode: 'kn-IN' },
+  // { code: 'ml', label: 'Malayalam', nativeLabel: 'മലയാളം', speechCode: 'ml-IN' },
+  // { code: 'pa', label: 'Punjabi', nativeLabel: 'ਪੰਜਾਬੀ', speechCode: 'pa-IN' },
   { code: 'ur', label: 'Urdu', nativeLabel: 'اردو', speechCode: 'ur-IN' },
   { code: 'es', label: 'Spanish', nativeLabel: 'Español', speechCode: 'es-ES' },
   { code: 'fr', label: 'French', nativeLabel: 'Français', speechCode: 'fr-FR' },
   { code: 'de', label: 'German', nativeLabel: 'Deutsch', speechCode: 'de-DE' },
   { code: 'ja', label: 'Japanese', nativeLabel: '日本語', speechCode: 'ja-JP' },
-  { code: 'ko', label: 'Korean', nativeLabel: '한국어', speechCode: 'ko-KR' },
-  { code: 'zh', label: 'Chinese', nativeLabel: '中文', speechCode: 'zh-CN' },
+  // { code: 'ko', label: 'Korean', nativeLabel: '한국어', speechCode: 'ko-KR' },
+  // { code: 'zh', label: 'Chinese', nativeLabel: '中文', speechCode: 'zh-CN' },
   { code: 'ar', label: 'Arabic', nativeLabel: 'العربية', speechCode: 'ar-SA' },
   { code: 'pt', label: 'Portuguese', nativeLabel: 'Português', speechCode: 'pt-BR' },
   { code: 'ru', label: 'Russian', nativeLabel: 'Русский', speechCode: 'ru-RU' },
@@ -460,7 +454,7 @@ export default function ChatInterface() {
               </div>
 
               <div className={styles.suggestionsGrid}>
-                {SUGGESTIONS.map((suggestion, i) => (
+                {(SUGGESTIONS_TRANSLATIONS[selectedLanguage.code] || SUGGESTIONS_TRANSLATIONS['en']).map((suggestion, i) => (
                   <button
                     key={i}
                     className={styles.suggestionChip}
@@ -476,27 +470,24 @@ export default function ChatInterface() {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`${styles.messageRow} ${
-                    message.role === 'user'
-                      ? styles.messageRowUser
-                      : styles.messageRowBot
-                  }`}
+                  className={`${styles.messageRow} ${message.role === 'user'
+                    ? styles.messageRowUser
+                    : styles.messageRowBot
+                    }`}
                 >
                   <div
-                    className={`${styles.avatar} ${
-                      message.role === 'user'
-                        ? styles.avatarUser
-                        : styles.avatarBot
-                    }`}
+                    className={`${styles.avatar} ${message.role === 'user'
+                      ? styles.avatarUser
+                      : styles.avatarBot
+                      }`}
                   >
                     {message.role === 'user' ? '👤' : '🍢'}
                   </div>
                   <div
-                    className={`${styles.messageBubble} ${
-                      message.role === 'user'
-                        ? styles.bubbleUser
-                        : styles.bubbleBot
-                    }`}
+                    className={`${styles.messageBubble} ${message.role === 'user'
+                      ? styles.bubbleUser
+                      : styles.bubbleBot
+                      }`}
                   >
                     {message.role === 'assistant' ? (
                       <div
@@ -510,7 +501,7 @@ export default function ChatInterface() {
                     )}
                     {isStreaming &&
                       message.id ===
-                        messages[messages.length - 1]?.id &&
+                      messages[messages.length - 1]?.id &&
                       message.role === 'assistant' && (
                         <span className={styles.streamCursor}>|</span>
                       )}

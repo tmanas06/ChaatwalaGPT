@@ -43,7 +43,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
   de: 'German',
   ja: 'Japanese',
   ko: 'Korean',
-  zh: 'Chinese (Simplified)',
+  // zh: 'Chinese (Simplified)',
   ar: 'Arabic',
   pt: 'Portuguese',
   ru: 'Russian',
