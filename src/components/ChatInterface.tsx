@@ -158,6 +158,12 @@ export default function ChatInterface() {
   useEffect(() => {
     if (authenticated && user?.id && sessions.length > 0) {
       localStorage.setItem(`chaatwala_sessions_${user.id}`, JSON.stringify(sessions));
+      
+      // Save last order for product-first memory
+      const lastUserMsg = [...sessions[0].messages].reverse().find(m => m.role === 'user');
+      if (lastUserMsg) {
+        localStorage.setItem(`chaatwala_last_order_${user.id}`, lastUserMsg.content);
+      }
     }
   }, [sessions, authenticated, user?.id]);
   const [factIndex, setFactIndex] = useState(0);
@@ -587,18 +593,49 @@ export default function ChatInterface() {
                 )}
               </div>
 
-              <div className={styles.suggestionsGrid}>
+              <div className={styles.buildYourOwn}>
+                <div className={styles.buildContent}>
+                  <span className={styles.buildEmoji}>👨‍🍳</span>
+                  <div className={styles.buildText}>
+                    <h3 className={styles.buildTitle}>Build Your Own Chaat</h3>
+                    <p className={styles.buildDesc}>Step-by-step: Choose base, spice & extras!</p>
+                  </div>
+                </div>
+                <button 
+                  className={styles.buildButton}
+                  onClick={() => sendMessage("I want to build my own chaat! Let's start step-by-step.")}
+                >
+                  Start Creating →
+                </button>
+              </div>
+
+              <div className={styles.landingGrid}>
                 {CRAVING_CHIPS.map((chip, i) => (
                   <button
                     key={i}
-                    className={styles.suggestionChip}
+                    className={styles.landingCard}
                     onClick={() => sendMessage(`I am craving ${chip.label}. Tell me more!`)}
                   >
-                    <span className={styles.chipIcon}>{chip.icon}</span>
-                    <span>{chip.label}</span>
+                    <span className={styles.cardEmoji}>{chip.icon}</span>
+                    <div className={styles.cardInfo}>
+                      <h3 className={styles.cardTitle}>{chip.label}</h3>
+                      <p className={styles.cardDesc}>Special Chandni Chowk style</p>
+                    </div>
                   </button>
                 ))}
               </div>
+
+              {authenticated && localStorage.getItem(`chaatwala_last_order_${user?.id}`) && (
+                <div className={styles.recentOrder}>
+                  <p className={styles.recentLabel}>Arre Bhaiya, vahi purana order? ☝️</p>
+                  <button 
+                    className={styles.recentButton}
+                    onClick={() => sendMessage(localStorage.getItem(`chaatwala_last_order_${user?.id}`) || '')}
+                  >
+                    Repeat: "{localStorage.getItem(`chaatwala_last_order_${user?.id}`)}"
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className={styles.messagesContainer}>
@@ -656,14 +693,14 @@ export default function ChatInterface() {
                   <div className={`${styles.avatar} ${styles.avatarBot}`}>
                     🍢
                   </div>
-                  <div className={`${styles.messageBubble} ${styles.bubbleBot}`}>
+                  <div className={styles.loadingBubble}>
                     <div className={styles.loadingDots}>
                       <span className={styles.dot} />
                       <span className={styles.dot} />
                       <span className={styles.dot} />
                     </div>
                     <span className={styles.thinkingText}>
-                      Chaatwala is preparing your order… 🧑‍🍳
+                      Bhaiya order bana raha hai… 🧑‍🍳🔥
                     </span>
                   </div>
                 </div>

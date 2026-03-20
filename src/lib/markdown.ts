@@ -15,8 +15,11 @@ export function renderMarkdown(text: string): string {
   html = html
     .replace(/-\s+\[INGREDIENT\]\s+(.+)/g, '<span class="ingredient-tag">🥗 $1</span>')
     .replace(/\[BTN:\s*(.+?)\]/g, '<button class="markdown-action-btn" data-prompt="$1">$1</button>')
-    .replace(/###\s*RECIPE([\s\S]*?)(?=###|$)/g, '<div class="recipe-card"><div class="recipe-header">🧑‍🍳 Chaatwala\'s Recipe</div><div class="recipe-body">$1</div></div>')
-    .replace(/###\s*COMBO([\s\S]*?)(?=###|$)/g, '<div class="combo-card"><div class="combo-header">🍽️ Suggested Combo</div><div class="combo-body">$1</div></div>');
+    .replace(/###\s*RECIPE([\s\S]*?)(?=###|$)/g, '<div class="recipe-card"><div class="recipe-header">👨‍🍳 Chaatwala\'s Recipe</div><div class="recipe-body">$1</div></div>')
+    .replace(/###\s*COMBO([\s\S]*?)(?=###|$)/g, '<div class="combo-card"><div class="combo-header">🍽️ Suggested Combo</div><div class="combo-body">$1</div></div>')
+    .replace(/###\s*TIP([\s\S]*?)(?=###|$)/g, '<div class="tip-card"><div class="tip-header">💡 Chaatwala\'s Pro Tip</div><div class="tip-body">$1</div></div>')
+    .replace(/###\s*PRICE:\s*(.+)/g, '<div class="price-tag">💰 Street Price: $1</div>')
+    .replace(/###\s*SIMILAR:\s*(.+)/g, '<div class="similar-dishes"><strong>🤤 Also Try:</strong> $1</div>');
 
   // Bold and italic replacements
   html = html

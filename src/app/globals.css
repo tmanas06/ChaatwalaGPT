@@ -1,19 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&family=Kalam:wght@300;400;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
 :root {
-  /* Core Spice Palette */
+  /* Core Spice Palette - Premium */
   --saffron: #FF6B00;
+  --saffron-light: #FF8E3D;
   --deep-red: #D32F2F;
+  --deep-red-dark: #8E1C1C;
   --turmeric: #F4A261;
+  --turmeric-light: #FFBC8B;
   --warm-brown: #4A2C0A;
+  --gold: #D4AF37;
   
   /* Neutrals */
   --cream: #FFF8EF;
+  --cream-dark: #F5E6D3;
   --dark-ink: #1A0F00;
+  --dark-ink-light: #2A1A06;
   
   /* UI Colors */
   --success: #2E7D32;
   --error: #C62828;
+  --info: #0288D1;
   
   /* Typography */
   --font-playfair: 'Playfair Display', Georgia, serif;
@@ -21,8 +28,11 @@
   --font-dm: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   
   /* Effects */
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-sm: 0 4px 12px rgba(26, 15, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(26, 15, 0, 0.1);
+  --shadow-lg: 0 12px 32px rgba(26, 15, 0, 0.15);
+  --glass: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.4);
 }
 
 *,
@@ -148,28 +158,55 @@ body {
   font-weight: 600;
 }
 
-.recipe-card, .combo-card {
-  background: rgba(255, 248, 239, 0.6);
-  border: 1px solid rgba(244, 166, 35, 0.4);
-  border-radius: 12px;
+.recipe-card, .combo-card, .tip-card {
+  background: white;
+  border: 1px solid var(--turmeric-light);
+  border-radius: 16px;
   overflow: hidden;
-  margin: 1rem 0;
-  box-shadow: var(--shadow-sm);
+  margin: 1.25rem 0;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s ease;
 }
-.combo-card { border-color: rgba(211, 47, 47, 0.3); }
 
-.recipe-header, .combo-header {
-  background: rgba(244, 166, 35, 0.15);
-  padding: 0.5rem 1rem;
+.recipe-card:hover, .combo-card:hover, .tip-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.combo-card { border-color: rgba(211, 47, 47, 0.2); }
+.tip-card { border-color: var(--info); border-left: 4px solid var(--info); }
+
+.recipe-header, .combo-header, .tip-header {
+  background: linear-gradient(90deg, rgba(244, 166, 35, 0.1), transparent);
+  padding: 0.75rem 1rem;
   font-family: var(--font-playfair);
-  font-weight: 700;
+  font-weight: 800;
   color: var(--saffron);
-  border-bottom: 1px solid rgba(244, 166, 35, 0.2);
+  border-bottom: 1px solid rgba(244, 166, 35, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
-.combo-header { background: rgba(211, 47, 47, 0.08); color: var(--deep-red); }
 
-.recipe-body, .combo-body {
-  padding: 1rem;
+.combo-header { background: linear-gradient(90deg, rgba(211, 47, 47, 0.05), transparent); color: var(--deep-red); }
+.tip-header { background: linear-gradient(90deg, rgba(2, 136, 209, 0.05), transparent); color: var(--info); }
+
+.recipe-body, .combo-body, .tip-body {
+  padding: 1.25rem;
+  font-size: 0.95rem;
+}
+
+.price-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #E8F5E9;
+  color: #2E7D32;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
 }
 
 .markdown-action-btn {
