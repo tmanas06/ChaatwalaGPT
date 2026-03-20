@@ -1,4 +1,4 @@
-# 🍢 Chaat GPT — Indian Street Food Guide
+# 🍢 ChaatwalaGPT — Indian Street Food Guide
 
 > **Meet Chaatwaala** — your passionate, deeply knowledgeable guide to Indian street food. Ask about recipes, regional specialties, spice blends, history, and the best places to eat across India.
 
@@ -8,9 +8,9 @@
 
 ---
 
-## What is Chaat GPT?
+## What is ChaatwalaGPT?
 
-Chaat GPT is a conversational AI chatbot that acts as your personal Indian street food expert. The bot's persona — **"Chaatwaala"** — is a warm, enthusiastic vendor who knows every gali (lane), masala (spice), and recipe from Mumbai's Juhu Beach to Delhi's Chandni Chowk.
+ChaatwalaGPT is a conversational AI chatbot that acts as your personal Indian street food expert. The bot's persona — **"Chaatwaala"** — is a warm, enthusiastic vendor who knows every gali (lane), masala (spice), and recipe from Mumbai's Juhu Beach to Delhi's Chandni Chowk.
 
 ### Why Indian Street Food?
 

@@ -436,7 +436,7 @@ export default function ChatInterface() {
           {isEmpty ? (
             <div className={styles.emptyState}>
               <div className={styles.emptyEmoji}>🍢</div>
-              <h2 className={styles.emptyTitle}>Chaat GPT</h2>
+              <h2 className={styles.emptyTitle}>ChaatwalaGPT</h2>
               <p className={styles.emptyTagline}>
                 Aao, khao, seekho! — Come, eat, learn!
               </p>

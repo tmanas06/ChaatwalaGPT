@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Chaat GPT — Indian Street Food Guide',
+  title: 'ChaatwalaGPT — Indian Street Food Guide',
   description:
     'Meet Chaatwaala — your passionate, knowledgeable guide to Indian street food. Ask about recipes, regional specialties, spice blends, history, and the best places to eat across India.',
   keywords: [
