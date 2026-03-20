@@ -456,11 +456,11 @@ export default function ChatInterface() {
           <div className={styles.headerRight}>
             <div className={styles.authWrapper}>
               {authenticated ? (
-                <button className={styles.langBtn} onClick={logout}>
+                <button className={styles.langButton} onClick={logout} title="Sign out of Chaatwaala">
                   Sign Out
                 </button>
               ) : (
-                <button className={styles.langBtn} onClick={login} style={{ background: 'var(--saffron)', color: 'white', borderColor: 'var(--saffron)' }}>
+                <button className={styles.langButton} onClick={login} style={{ background: 'var(--saffron)', color: 'white', borderColor: 'var(--saffron)' }}>
                   Sign In to Save Chats
                 </button>
               )}
