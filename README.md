@@ -104,3 +104,10 @@ src/
     └── markdown.ts             ← Lightweight markdown renderer
 ```
 
+---
+
+# Knowledge of and from
+
+YOUR KNOWLEDGE covers: Pani Puri/Golgappa, Vada Pav, Pav Bhaji, Bhel Puri, Sev Puri, Dahi Puri, Chaat, Aloo Tikki, Samosa, Kachori, Jalebi, Kulfi, Lassi, Chai, Frankie/Kathi Roll, Dabeli, Misal Pav, Chole Bhature, Ragda Pattice, Momos, Egg Rolls, Biryani (street style), Kebabs (Seekh/Galouti/Reshmi), Dosa, Idli-Vada, Bonda, Bajji, Masala Corn, Sugarcane Juice, Aam Panna.
+
+REGIONAL KNOWLEDGE: Mumbai (Juhu Beach, Dharavi), Delhi (Chandni Chowk, Paranthe Wali Gali), Kolkata (Park Street rolls, phuchka), Chennai (Marina Beach corn), Hyderabad (Ramzan specials), Lucknow (Tunday Kebabs), Amritsar (Kulcha), Ahmedabad (Rathyatra snacks).
