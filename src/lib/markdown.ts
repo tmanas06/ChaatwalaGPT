@@ -4,46 +4,51 @@
  */
 
 export function renderMarkdown(text: string): string {
-  let html = escapeHtml(text);
+  // 1. Sanitize raw HTML from LLM to prevent XSS (if any <script> tags leak)
+  let sanitized = text
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, '');
 
-  // Code blocks (```)
-  html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+  let html = escapeHtml(sanitized);
 
-  // Inline code
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Bold and italic replacements
+  html = html
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(?!\*)(.*?)(?<!\*)\*/g, '<em>$1</em>');
 
-  // Bold (**text** or __text__)
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+  // Process line by line for paragraphs and lists
+  const lines = html.split('\n');
+  const result: string[] = [];
+  let inList = false;
 
-  // Italic (*text* or _text_)
-  html = html.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
-  html = html.replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '<em>$1</em>');
-
-  // Headers (## text)
-  html = html.replace(/^### (.+)$/gm, '<h4>$1</h4>');
-  html = html.replace(/^## (.+)$/gm, '<h3>$1</h3>');
-  html = html.replace(/^# (.+)$/gm, '<h2>$1</h2>');
-
-  // Unordered lists
-  html = html.replace(/^[\-\*] (.+)$/gm, '<li>$1</li>');
-  html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
-
-  // Numbered lists
-  html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
-
-  // Paragraphs - convert double newlines
-  html = html.replace(/\n\n/g, '</p><p>');
-
-  // Single newlines to <br>
-  html = html.replace(/\n/g, '<br/>');
-
-  // Wrap in paragraph if not already wrapped
-  if (!html.startsWith('<')) {
-    html = '<p>' + html + '</p>';
+  for (const line of lines) {
+    const listMatch = line.match(/^[-•*]\s+(.+)/) || line.match(/^\d+\.\s+(.+)/);
+    
+    if (listMatch) {
+      if (!inList) { 
+        result.push('<ul>'); 
+        inList = true; 
+      }
+      result.push(`<li>${listMatch[1]}</li>`);
+    } else {
+      if (inList) { 
+        result.push('</ul>'); 
+        inList = false; 
+      }
+      if (line.trim() === '') {
+        result.push(''); // blank line becomes empty string for joining
+      } else {
+        result.push(`<p>${line}</p>`);
+      }
+    }
+  }
+  
+  if (inList) {
+    result.push('</ul>');
   }
 
-  return html;
+  // Join back and clean up empty paragraph gaps
+  return result.join('\n').replace(/\n{2,}/g, '\n');
 }
 
 function escapeHtml(text: string): string {

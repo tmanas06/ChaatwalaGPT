@@ -232,7 +232,9 @@ export default function ChatInterface() {
     abortControllerRef.current = abortController;
 
     try {
-      const allMessages = [...messages, userMessage];
+      // Keep last 10 messages before the new user prompt to stay within LLaMA context window
+      const trimmedMessages = messages.slice(-10);
+      const allMessages = [...trimmedMessages, userMessage];
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -269,6 +271,7 @@ export default function ChatInterface() {
       setIsLoading(false);
 
       let buffer = '';
+      let rafPending = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -276,18 +279,14 @@ export default function ChatInterface() {
 
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        buffer = lines.pop() ?? ''; // Keep incomplete part
 
         for (const line of lines) {
           const trimmed = line.trim();
           if (!trimmed || !trimmed.startsWith('data: ')) continue;
 
           const data = trimmed.slice(6);
-
-          if (data === '[DONE]') {
-            setIsStreaming(false);
-            break;
-          }
+          if (data === '[DONE]') continue; // don't break loop early, continue processing buffer if needed
 
           try {
             const parsed = JSON.parse(data);
@@ -296,16 +295,24 @@ export default function ChatInterface() {
             }
             if (parsed.text) {
               accumulatedContent += parsed.text;
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId
-                    ? { ...m, content: accumulatedContent }
-                    : m
-                )
-              );
+
+              // Throttle React state updates using rAF
+              if (!rafPending) {
+                rafPending = true;
+                requestAnimationFrame(() => {
+                  setMessages((prev) =>
+                    prev.map((m) =>
+                      m.id === assistantId
+                        ? { ...m, content: accumulatedContent }
+                        : m
+                    )
+                  );
+                  rafPending = false;
+                });
+              }
             }
           } catch (e) {
-            // Skip unparseable chunks
+            // Skip unparseable JSON chunks
             if (e instanceof SyntaxError) continue;
             throw e;
           }
